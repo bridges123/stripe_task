@@ -1,3 +1,4 @@
+import stripe
 import os
 from dotenv import load_dotenv
 from pathlib import Path
@@ -12,6 +13,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
+
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
