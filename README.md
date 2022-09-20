@@ -1,3 +1,10 @@
+## Usage
+You can test app on page <b>185.180.231.142:8000</b>
+or send direct request:
+```sh
+curl -X GET http://185.180.231.142:8000/item/{id}
+```
+
 ## Setup
 
 Clone repository:
