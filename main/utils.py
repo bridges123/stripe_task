@@ -1,6 +1,6 @@
 import stripe
 
-from .models import Item
+from .models import Item, Order
 
 
 def item_exists(id: int):
@@ -8,7 +8,12 @@ def item_exists(id: int):
     return item
 
 
-def create_session(item: Item):
+def order_exists(id: int):
+    order = Order.objects.filter(id=id).first()
+    return order
+
+
+def create_session(items: list[Item]):
     try:
         session = stripe.checkout.Session.create(
             success_url="https://127.0.0.1/",
@@ -16,15 +21,15 @@ def create_session(item: Item):
             line_items=[
                 {
                     "price_data": {
-                        "unit_amount": item.price * 100,
+                        "unit_amount": item.item.price * 100,
                         "currency": "usd",
                         'product_data': {
-                            'name': item.name,
-                            'description': item.description,
+                            'name': item.item.name,
+                            'description': item.item.description,
                         },
                     },
                     "quantity": 1,
-                },
+                } for item in items
             ],
             mode="payment",
         )

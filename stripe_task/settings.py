@@ -15,11 +15,12 @@ load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_PUBLISH_KEY = os.getenv('STRIPE_PUBLISH_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '185.180.231.142', 'vm1924762.firstbyte.club']
 
 
 # Application definition

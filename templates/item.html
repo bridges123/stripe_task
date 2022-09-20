@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <title>Buy {{ item.name }}</title>
+</head>
+<body>
+<h1>{{ item.name }} {{ item.id }}</h1>
+<p>{{ item.description }}</p>
+<p>{{ item.price }}</p>
+<p>{{ item.quantity }}</p>
+<button id="buy-button" onclick="buy()">Buy</button>
+<br>
+<label for="count">Кол-во:</label><input id="count" type="text">
+<button id="add-order-button" onclick="add_to_order()">Add in order</button>
+<script>
+    const stripe = Stripe('{{ PUBLISH_KEY }}');
+
+    function buy() {
+        fetch("/buy/{{ item.id }}", {method: "GET"})
+            .then(response => response.json())
+            .then(session => stripe.redirectToCheckout({sessionId: session.id}))
+    }
+
+    function add_to_order() {
+        $.ajax({
+            type: "POST",
+            url: "{% url 'item_buy' item.id %}",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            data: {
+                user_id: {{ request.user.id }},
+                count: document.getElementById('count').value,
+            },
+            success: function (data) {
+                if (data.status != 200)
+                    alert(data.error);
+                else
+                    window.location.replace({% url 'all_items' %})
+            }
+        })
+    }
+</script>
+</body>
+</html>
