@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <title>Buy Order {{ order.id }}</title>
+</head>
+<body>
+{% for item in order.items.all %}
+    <div class="item" style="margin: 25px;">
+        <h1>{{ item.item.name }} {{ item.item.id }}</h1>
+        <p>{{ item.item.description }}</p>
+        <p>{{ item.item.price }}</p>
+        <button id="remove-item" itemId="{{ item.item.id }}">Remove</button>
+    </div>
+{% endfor %}
+<p>Total price: {{ order.total_price }}</p>
+<button id="buy-button" onclick="buy()" style="font-size: 20px;">Buy</button>
+<script>
+    const stripe = Stripe('{{ PUBLISH_KEY }}');
+
+    function buy() {
+        fetch("/order-buy/{{ order.id }}", {method: "GET"})
+            .then(response => response.json())
+            .then(session => stripe.redirectToCheckout({sessionId: session.id}))
+    }
+
+    document.getElementById('remove-item').addEventListener('click', function () {
+        const itemId = this.attributes.itemId.value;
+        $.ajax({
+            type: "POST",
+            url: "{% url 'order_buy' order.id %}",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            data: {
+                item_id: itemId,
+            },
+            success: function (data) {
+                if (data.status != 200)
+                    alert(data.error);
+                else
+                    this.parentNode.remove()
+            }
+        })
+    });
+</script>
+</body>
+</html>
