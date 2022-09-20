@@ -13,7 +13,7 @@ def order_exists(id: int):
     return order
 
 
-def create_session(items: list[Item]):
+def create_session(items: list):
     try:
         session = stripe.checkout.Session.create(
             success_url="https://127.0.0.1/",
