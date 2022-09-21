@@ -1,14 +1,15 @@
 import stripe
+from typing import Union
 
 from .models import Item, Order
 
 
-def item_exists(id: int) -> Item | None:
+def item_exists(id: int) -> Union[Item, None]:
     item = Item.objects.filter(id=id).first()
     return item
 
 
-def order_exists(id: int) -> Order | None:
+def order_exists(id: int) -> Union[Order, None]:
     order = Order.objects.filter(id=id).first()
     return order
 
