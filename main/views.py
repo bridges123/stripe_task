@@ -20,7 +20,7 @@ def get_order_session(request, id: int):
     order = order_exists(id)
     if not order:
         return JsonResponse({'status': 404, 'msg': f'No order with id: {id}'})
-    result, session = create_order_session(order.items.all())
+    result, session = create_order_session(order)
     if not result:
         return JsonResponse({'status': 400, 'message': str(session)})
     return JsonResponse({'id': session.get('id')})

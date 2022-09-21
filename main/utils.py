@@ -54,7 +54,8 @@ def create_session(item: Item) -> tuple:
         return False, ex
 
 
-def create_order_session(items: list) -> tuple:
+def create_order_session(order: Order) -> tuple:
+    is_tax = bool(len(order.taxes.all()))
     try:
         session = stripe.checkout.Session.create(
             success_url="https://127.0.0.1/",
@@ -70,8 +71,14 @@ def create_order_session(items: list) -> tuple:
                         },
                     },
                     "quantity": 1,
-                } for item in items
+                } for item in order.items.all()
             ],
+            discounts=[{
+                'coupon': stripe.Coupon.create(percent_off=discount.discount, duration='once').id
+            } for discount in order.discounts.all() if discount.is_active],
+            # automatic_tax={
+            #     'enabled': is_tax,
+            # },
             mode="payment",
         )
         return True, session
