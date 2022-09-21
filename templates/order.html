@@ -10,17 +10,21 @@
     <title>Buy Order {{ order.id }}</title>
 </head>
 <body>
-{% for item in order.items.all %}
-    <div class="item" itemId="{{ item.item.id }}" style="margin: 25px;">
-        <h1>{{ item.item.name }} {{ item.item.id }}</h1>
-        <p>{{ item.item.description }}</p>
-        <p id="price">{{ item.item.price }}</p>
-        <p id="quantity">Count: {{ item.quantity }}</p>
-        <button id="remove-item">Remove</button>
-    </div>
-{% endfor %}
-<p>Total price: <span id="total-price">{{ order.total_price }}</span></p>
-<button id="buy-button" onclick="buy()" style="font-size: 20px;">Buy</button>
+{% if not order.items.all %}
+    <h1 style="text-align: center; margin-top: 300px">Empty order</h1>
+{% else %}
+    {% for item in order.items.all %}
+        <div class="item" itemId="{{ item.item.id }}" style="margin: 25px;">
+            <h1>{{ item.item.name }} {{ item.item.id }}</h1>
+            <p>{{ item.item.description }}</p>
+            <p id="price">{{ item.item.price }}</p>
+            <p id="quantity">Count: {{ item.quantity }}</p>
+            <button id="remove-item">Remove</button>
+        </div>
+    {% endfor %}
+    <p>Total price: <span id="total-price">{{ order.total_price }}</span></p>
+    <button id="buy-button" onclick="buy()" style="font-size: 20px;">Buy</button>
+{% endif %}
 <script>
     const stripe = Stripe('{{ PUBLISH_KEY }}');
 

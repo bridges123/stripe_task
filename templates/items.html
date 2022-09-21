@@ -7,10 +7,9 @@
 <body>
 <a href="{% url 'order_buy' order_id %}"><button style="font-size: 20px;">Order</button></a>
 {% for item in items %}
-    <div class="item" style="margin: 25px">
+    <div class="item" style="margin: 35px">
         <h1>{{ item.name }} {{ item.id }}</h1>
-        <p>{{ item.description }}</p>
-        <p>{{ item.price }}</p>
+        <p>{{ item.price }} {{ item.get_viewed_currency }}</p>
         <a href="{% url 'item_buy' item.id %}"><button style="font-size: 20px;">Info</button></a>
     </div>
 {% endfor %}

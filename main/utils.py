@@ -37,7 +37,7 @@ def create_session(item: Item) -> tuple:
                 {
                     "price_data": {
                         "unit_amount": item.price * 100,
-                        "currency": "usd",
+                        "currency": item.currency,
                         'product_data': {
                             'name': item.name,
                             'description': item.description,

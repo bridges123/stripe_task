@@ -1,12 +1,26 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+CURRENCY_CHOICES = [
+    ('rub', '₽'),
+    ('usd', '$'),
+    ('eur', '€')
+]
+
 
 class Item(models.Model):
     name = models.CharField('Имя', max_length=255)
     description = models.TextField('Описание')
     price = models.IntegerField('Цена')
     quantity = models.IntegerField('Количество')
+    currency = models.CharField('Валюта', choices=CURRENCY_CHOICES, max_length=3)
+
+    def get_viewed_currency(self):
+        for CHOICE in CURRENCY_CHOICES:
+            if CHOICE[0] == self.currency:
+                return CHOICE[1]
+        return self.currency
+
 
 
 class Order(models.Model):
