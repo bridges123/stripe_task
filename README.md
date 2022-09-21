@@ -36,3 +36,6 @@ Or to direct request:
 ```sh
 curl -X GET http://localhost:8000/item/{id}
 ```
+
+To use Order functionality need to log-in in admin panel (for start):
+<a>http://185.180.231.142:8000/admin</a> with login/pass - admin:admin
