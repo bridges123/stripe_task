@@ -20,7 +20,7 @@ def get_order_session(request, id: int):
     order = order_exists(id)
     if not order:
         return JsonResponse({'status': 404, 'msg': f'No order with id: {id}'})
-    result, session = create_session(order.items.all())
+    result, session = create_order_session(order.items.all())
     if not result:
         return JsonResponse({'status': 400, 'message': str(session)})
     return JsonResponse({'id': session.get('id')})
@@ -43,7 +43,7 @@ def get_payment(request, id: int):
 def all_items(request):
     context = {
         'items': Item.objects.all(),
-        'order_id': Order.objects.get(user_id=request.user.id).id,
+        'order_id': Order.objects.get(user=request.user).id,
     }
     return render(request, 'items.html', context)
 
@@ -72,13 +72,10 @@ def item_buy(request, id: int):
         if count > item.quantity:
             return JsonResponse({'status': 400, 'error': f'Not enough items. Left: {item.quantity}'})
         if user_id and id:
-            order = Order.objects.filter(user_id=user_id).first()
-            if order and item:
-                order.add(item, count)
-                item.quantity -= count
-                item.save()
+            res = edit_order(user_id, item, count)
+            if res:
                 return JsonResponse({'status': 200})
-    return JsonResponse({'status': 400, 'error': 'Incorrect item or user'})
+    return JsonResponse({'status': 400, 'error': 'Incorrect item or user_id'})
 
 
 def order_buy(request, id: int):
@@ -93,9 +90,14 @@ def order_buy(request, id: int):
         item_id = request.POST.get('item_id')
         if not item_id:
             return JsonResponse({'status': 400, 'error': 'Incorrect item_id value.'})
-        order_item = order.items.filter(item_id=item_id).first()
+        item = Item.objects.filter(id=item_id).first()
+        if not item:
+            return JsonResponse({'status': 400, 'error': 'Incorrect item_id value.'})
+        order_item = order.items.filter(item=item).first()
         if not order_item:
             return JsonResponse({'status': 400, 'error': 'Incorrect item_id value.'})
+        item.quantity += order_item.quantity
+        item.save()
         order_item.delete()
         return JsonResponse({'status': 200})
     return render(request, 'order.html', context)

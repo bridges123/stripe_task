@@ -11,14 +11,15 @@
 </head>
 <body>
 {% for item in order.items.all %}
-    <div class="item" style="margin: 25px;">
+    <div class="item" itemId="{{ item.item.id }}" style="margin: 25px;">
         <h1>{{ item.item.name }} {{ item.item.id }}</h1>
         <p>{{ item.item.description }}</p>
-        <p>{{ item.item.price }}</p>
-        <button id="remove-item" itemId="{{ item.item.id }}">Remove</button>
+        <p id="price">{{ item.item.price }}</p>
+        <p id="quantity">Count: {{ item.quantity }}</p>
+        <button id="remove-item">Remove</button>
     </div>
 {% endfor %}
-<p>Total price: {{ order.total_price }}</p>
+<p>Total price: <span id="total-price">{{ order.total_price }}</span></p>
 <button id="buy-button" onclick="buy()" style="font-size: 20px;">Buy</button>
 <script>
     const stripe = Stripe('{{ PUBLISH_KEY }}');
@@ -30,7 +31,8 @@
     }
 
     document.getElementById('remove-item').addEventListener('click', function () {
-        const itemId = this.attributes.itemId.value;
+        const parent = this.parentNode;
+        const itemId = parent.attributes.itemId.value;
         $.ajax({
             type: "POST",
             url: "{% url 'order_buy' order.id %}",
@@ -41,10 +43,14 @@
                 item_id: itemId,
             },
             success: function (data) {
-                if (data.status != 200)
+                if (data.status != 200) {
                     alert(data.error);
-                else
-                    this.parentNode.remove()
+                } else {
+                    parent.remove();
+                    const newTotalPrice = parseInt(parent.querySelector('#quantity').textContent) *
+                        parseInt(parent.querySelector('#price')) || 0;
+                    document.getElementById('total-price').textContent = String(newTotalPrice);
+                }
             }
         })
     });

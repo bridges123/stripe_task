@@ -13,16 +13,16 @@
 <h1>{{ item.name }} {{ item.id }}</h1>
 <p>{{ item.description }}</p>
 <p>{{ item.price }}</p>
-<p>{{ item.quantity }}</p>
-<button id="buy-button" onclick="buy()">Buy</button>
+<p>Count: <span>{{ item.quantity }}</span></p>
 <br>
-<label for="count">Кол-во:</label><input id="count" type="text">
+<label for="count">Кол-во:</label><input id="count" value="1" type="text"><br>
+<button id="buy-button" onclick="buy()">Buy</button>
 <button id="add-order-button" onclick="add_to_order()">Add in order</button>
 <script>
     const stripe = Stripe('{{ PUBLISH_KEY }}');
 
     function buy() {
-        fetch("/buy/{{ item.id }}", {method: "GET"})
+        fetch("/buy/{{ item.id }}", {method: "GET", body: {count: document.getElementById('count').value}})
             .then(response => response.json())
             .then(session => stripe.redirectToCheckout({sessionId: session.id}))
     }
